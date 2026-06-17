@@ -1,4 +1,4 @@
-import io, cv2, json
+import io, cv2, os
 import numpy as np
 from PIL import Image
 import tensorflow as tf
@@ -8,19 +8,41 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="FallGuard AI")
-
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# ── Download model from Google Drive at startup ───────────
+MODEL_PATH = "fall_model.tflite"
+FILE_ID    = "1Cl6nGWmZXBp4srbML3djAM2n1GV_v4lU"  
+
+def download_model():
+    if not os.path.exists(MODEL_PATH):
+        print("Downloading model from Google Drive...")
+        import urllib.request
+        url = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
+        urllib.request.urlretrieve(url, MODEL_PATH)
+        size = os.path.getsize(MODEL_PATH) / 1024 / 1024
+        print(f"✅ Model downloaded: {size:.1f} MB")
+    else:
+        print("✅ Model already exists")
+
+download_model()
+
+# ── Load TFLite model ─────────────────────────────────────
 print("Loading model...")
-model = tf.keras.models.load_model("fall_model.h5")
+interpreter = tf.lite.Interpreter(model_path=MODEL_PATH)
+interpreter.allocate_tensors()
+input_details  = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 IMG_SIZE = (224, 224)
 print("✅ Model ready")
 
 def run_inference(image_bytes):
     img  = Image.open(io.BytesIO(image_bytes)).convert("RGB").resize(IMG_SIZE)
     arr  = np.expand_dims(np.array(img) / 255.0, 0).astype("float32")
-    prob = float(model.predict(arr, verbose=0)[0][0])
+    interpreter.set_tensor(input_details[0]['index'], arr)
+    interpreter.invoke()
+    prob  = float(interpreter.get_tensor(output_details[0]['index'])[0][0])
     label = "non_fall" if prob > 0.5 else "fall"
     conf  = prob if prob > 0.5 else 1 - prob
     return label, round(conf * 100, 2)
@@ -29,7 +51,7 @@ def run_inference(image_bytes):
 def index(): return FileResponse("static/index.html")
 
 @app.get("/health")
-def health(): return {"status": "ok", "model": "MobileNetV2"}
+def health(): return {"status": "ok", "model": "MobileNetV2 TFLite"}
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
@@ -52,7 +74,8 @@ async def websocket(ws: WebSocket):
             if frame is None: continue
             _, buf = cv2.imencode(".jpg", frame)
             label, conf = run_inference(buf.tobytes())
-            await ws.send_json({"label": label, "confidence": conf, "alert": label == "fall"})
+            await ws.send_json({"label": label, "confidence": conf,
+                                "alert": label == "fall"})
     except WebSocketDisconnect:
         pass
     except Exception as e:
