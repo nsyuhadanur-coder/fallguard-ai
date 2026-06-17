@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FallGuard AI — Elderly Fall Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+<div class="ambient">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <div class="brand-icon">⚕</div>
+      <span>FallGuard<em>AI</em></span>
+    </div>
+    <div class="nav-links">
+      <a href="#live">Live</a>
+      <a href="#upload">Upload</a>
+      <a href="#about">About</a>
+    </div>
+    <div class="nav-badge" id="nav-badge">
+      <span class="live-dot" id="live-dot"></span>
+      <span id="nav-status">Offline</span>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">MobileNetV2 · Real-Time AI</div>
+    <h1>Fall Detection<br><span class="gradient-text">Powered by Vision</span></h1>
+    <p class="hero-sub">An intelligent monitoring system that detects elderly falls in real-time using deep learning — protecting lives through the power of computer vision.</p>
+    <div class="hero-actions">
+      <a href="#live" class="btn-hero-primary">Start Live Detection</a>
+      <a href="#upload" class="btn-hero-ghost">Upload Image</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><span class="hstat-val">MobileNetV2</span><span class="hstat-lbl">Architecture</span></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><span class="hstat-val">224×224</span><span class="hstat-lbl">Input Resolution</span></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><span class="hstat-val">2-Class</span><span class="hstat-lbl">Fall / Non-Fall</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="live">
+  <div class="section-inner">
+    <div class="section-tag">REAL-TIME</div>
+    <h2>Live Webcam Detection</h2>
+    <p class="section-sub">Your webcam feed is analyzed in real-time. A fall event triggers an instant alert.</p>
+    <div class="live-layout">
+      <div class="camera-card">
+        <canvas id="cap" hidden></canvas>
+        <div class="cam-viewport">
+          <video id="webcam" autoplay playsinline muted></video>
+          <div class="cam-overlay-idle" id="cam-idle">
+            <div class="cam-idle-icon">📷</div>
+            <p>Camera inactive</p>
+            <p class="cam-idle-sub">Click Start to begin monitoring</p>
+          </div>
+          <div class="result-badge hidden" id="result-badge">
+            <span id="badge-icon">✅</span>
+            <span id="badge-text">SAFE</span>
+          </div>
+          <div class="conf-pill hidden" id="conf-pill">
+            <span id="pill-conf">0%</span>
+          </div>
+          <div class="fall-alert hidden" id="fall-alert">
+            <div class="fall-alert-inner">
+              <div class="fall-alert-icon">⚠️</div>
+              <div class="fall-alert-text">FALL DETECTED</div>
+            </div>
+          </div>
+        </div>
+        <div class="cam-controls">
+          <button class="btn-start" id="btn-start">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
+            Start Monitoring
+          </button>
+          <button class="btn-stop hidden" id="btn-stop">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            Stop
+          </button>
+        </div>
+      </div>
+
+      <div class="stats-panel">
+        <div class="stat-block">
+          <div class="stat-lbl">STATUS</div>
+          <div class="stat-big" id="stat-status">Inactive</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-lbl">CONFIDENCE</div>
+          <div class="stat-big" id="stat-conf">—</div>
+          <div class="conf-track"><div class="conf-bar" id="conf-bar"></div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-mini"><div class="stat-lbl">FRAMES</div><div class="stat-num" id="stat-frames">0</div></div>
+          <div class="stat-mini"><div class="stat-lbl">ALERTS</div><div class="stat-num danger" id="stat-alerts">0</div></div>
+          <div class="stat-mini"><div class="stat-lbl">FPS</div><div class="stat-num" id="stat-fps">2</div></div>
+        </div>
+        <div class="alert-log">
+          <div class="alert-log-header">
+            <span class="stat-lbl">ALERT LOG</span>
+            <button class="btn-log-clear" id="btn-clear">Clear</button>
+          </div>
+          <div class="alert-log-body" id="log-body">
+            <p class="log-empty">No alerts recorded</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="upload">
+  <div class="section-inner">
+    <div class="section-tag">SINGLE IMAGE</div>
+    <h2>Upload & Analyze</h2>
+    <p class="section-sub">Upload a photo to instantly classify it as fall or non-fall.</p>
+    <div class="upload-layout">
+      <div class="upload-card" id="upload-zone">
+        <input type="file" id="file-input" accept="image/*" hidden/>
+        <div class="upload-idle" id="upload-idle">
+          <div class="upload-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <p class="upload-title">Drop image here</p>
+          <p class="upload-sub">or <span class="upload-link" id="upload-link">browse files</span></p>
+          <p class="upload-formats">JPG · PNG · JPEG</p>
+        </div>
+        <img class="upload-preview hidden" id="upload-preview" alt="preview"/>
+      </div>
+      <div class="upload-result hidden" id="upload-result">
+        <div class="result-card" id="result-card">
+          <div class="result-icon" id="result-icon">—</div>
+          <div class="result-label" id="result-label">—</div>
+          <div class="result-conf-row">
+            <span class="stat-lbl">CONFIDENCE</span>
+            <span class="result-conf-val" id="result-conf-val">—</span>
+          </div>
+          <div class="conf-track"><div class="conf-bar" id="upload-conf-bar"></div></div>
+          <button class="btn-retry" id="btn-retry">Try Another Image</button>
+        </div>
+      </div>
+      <div class="upload-loading hidden" id="upload-loading">
+        <div class="spinner-ring"></div>
+        <p>Analyzing image…</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="section-inner">
+    <div class="section-tag">ABOUT</div>
+    <h2>How It Works</h2>
+    <div class="about-grid">
+      <div class="about-card"><div class="about-num">01</div><h3>Capture</h3><p>Webcam frames are captured at 2 fps and sent to the server via WebSocket for real-time processing.</p></div>
+      <div class="about-card"><div class="about-num">02</div><h3>Inference</h3><p>Each frame is resized to 224×224 and passed through MobileNetV2 trained on fall/non-fall images.</p></div>
+      <div class="about-card"><div class="about-num">03</div><h3>Alert</h3><p>When a fall is detected with high confidence, an immediate visual and audio alert is triggered.</p></div>
+      <div class="about-card"><div class="about-num">04</div><h3>Log</h3><p>Every fall event is timestamped and stored in the alert log for review and monitoring history.</p></div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-pill">MobileNetV2</div>
+      <div class="tech-pill">TensorFlow</div>
+      <div class="tech-pill">FastAPI</div>
+      <div class="tech-pill">WebSocket</div>
+      <div class="tech-pill">Transfer Learning</div>
+      <div class="tech-pill">BERR 4743</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="brand-icon sm">⚕</div>
+      <span>FallGuard<em>AI</em></span>
+    </div>
+    <p>BERR 4743 · Computer Vision & Pattern Recognition · Vision-Based Fall Detection for Elderly Monitoring</p>
+  </div>
+</footer>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
