@@ -24,7 +24,6 @@
     </div>
     <div class="nav-links">
       <a href="#live">Live</a>
-      <a href="#upload">Upload</a>
       <a href="#about">About</a>
     </div>
     <div class="nav-badge" id="nav-badge">
@@ -41,7 +40,7 @@
     <p class="hero-sub">An intelligent monitoring system that detects elderly falls in real-time using deep learning — protecting lives through the power of computer vision.</p>
     <div class="hero-actions">
       <a href="#live" class="btn-hero-primary">Start Live Detection</a>
-      <a href="#upload" class="btn-hero-ghost">Upload Image</a>
+      <a href="#about" class="btn-hero-ghost">How It Works</a>
     </div>
     <div class="hero-stats">
       <div class="hstat"><span class="hstat-val">MobileNetV2</span><span class="hstat-lbl">Architecture</span></div>
@@ -123,49 +122,7 @@
   </div>
 </section>
 
-<section class="section alt" id="upload">
-  <div class="section-inner">
-    <div class="section-tag">SINGLE IMAGE</div>
-    <h2>Upload & Analyze</h2>
-    <p class="section-sub">Upload a photo to instantly classify it as fall or non-fall.</p>
-    <div class="upload-layout">
-      <div class="upload-card" id="upload-zone">
-        <input type="file" id="file-input" accept="image/*" hidden/>
-        <div class="upload-idle" id="upload-idle">
-          <div class="upload-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-          </div>
-          <p class="upload-title">Drop image here</p>
-          <p class="upload-sub">or <span class="upload-link" id="upload-link">browse files</span></p>
-          <p class="upload-formats">JPG · PNG · JPEG</p>
-        </div>
-        <img class="upload-preview hidden" id="upload-preview" alt="preview"/>
-      </div>
-      <div class="upload-result hidden" id="upload-result">
-        <div class="result-card" id="result-card">
-          <div class="result-icon" id="result-icon">—</div>
-          <div class="result-label" id="result-label">—</div>
-          <div class="result-conf-row">
-            <span class="stat-lbl">CONFIDENCE</span>
-            <span class="result-conf-val" id="result-conf-val">—</span>
-          </div>
-          <div class="conf-track"><div class="conf-bar" id="upload-conf-bar"></div></div>
-          <button class="btn-retry" id="btn-retry">Try Another Image</button>
-        </div>
-      </div>
-      <div class="upload-loading hidden" id="upload-loading">
-        <div class="spinner-ring"></div>
-        <p>Analyzing image…</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="about">
+<section class="section alt" id="about">
   <div class="section-inner">
     <div class="section-tag">ABOUT</div>
     <h2>How It Works</h2>
