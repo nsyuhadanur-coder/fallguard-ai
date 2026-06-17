@@ -11,16 +11,15 @@ app = FastAPI(title="FallGuard AI")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# ── Download model from Google Drive at startup ───────────
+# ── Download model using gdown ────────────────────────────
 MODEL_PATH = "fall_model.tflite"
-FILE_ID    = "1Cl6nGWmZXBp4srbML3djAM2n1GV_v4lU"  
+FILE_ID    = "13o6t19uWjvl16rnohIELgnHngAozIZTT"  
 
 def download_model():
     if not os.path.exists(MODEL_PATH):
         print("Downloading model from Google Drive...")
-        import urllib.request
-        url = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
-        urllib.request.urlretrieve(url, MODEL_PATH)
+        import gdown
+        gdown.download(id=FILE_ID, output=MODEL_PATH, quiet=False)
         size = os.path.getsize(MODEL_PATH) / 1024 / 1024
         print(f"✅ Model downloaded: {size:.1f} MB")
     else:
